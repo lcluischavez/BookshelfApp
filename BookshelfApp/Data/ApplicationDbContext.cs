@@ -16,6 +16,6 @@ namespace BookshelfApp.Data
         }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Book> Book { get; set; }
-
+        public DbSet<Author> Author { get; set; }
     }
 }
