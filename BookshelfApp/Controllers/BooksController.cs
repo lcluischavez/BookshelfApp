@@ -30,22 +30,22 @@ namespace BookshelfApp.Controllers
         public async Task<ActionResult> Index(string searchString)
         {
             var user = await GetCurrentUserAsync();
-            var cars = await _context.Car
+            var books = await _context.Book
                 //.Where(ti => ti.ApplicationUserId == user.Id)
                 .Include(tdi => tdi.ApplicationUser)
                 .ToListAsync();
 
             if (searchString != null)
             {
-                var filteredCars = _context.Car.Where(s => s.Make.Contains(searchString) || s.Model.Contains(searchString));
-                return View(filteredCars);
+                var filteredBooks = _context.Book.Where(s => s.Title.Contains(searchString) /* || s.ISBN.Contains(searchString)*/ ); 
+                return View(filteredBooks);
             };
 
-            return View(cars);
+            return View(books);
         }
 
 
-        // GET: Cars/Details/1
+        // GET: Books/Details/1
         public async Task<ActionResult> Details(int id)
         {
             if (id == null)
@@ -53,39 +53,39 @@ namespace BookshelfApp.Controllers
                 return NotFound();
             }
 
-            var car = await _context.Car
+            var book = await _context.Book
                //.Where(p => p.UserId == user.Id)
                .Include(p => p.ApplicationUser)
                .FirstOrDefaultAsync(p => p.Id == id);
 
-            if (car == null)
+            if (book == null)
             {
                 return NotFound();
             }
 
-            return View(car);
+            return View(book);
         }
 
 
 
-        // GET: Cars/Create
+        // GET: Books/Create
         public ActionResult Create()
         {
             return View();
         }
 
 
-        // POST: Cars/Create
+        // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(Car car)
+        public async Task<ActionResult> Create(Book book)
         {
             try
             {
                 var user = await GetCurrentUserAsync();
-                car.ApplicationUserId = user.Id;
+                book.ApplicationUserId = user.Id;
 
-                _context.Car.Add(car);
+                _context.Book.Add(book);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
@@ -98,30 +98,30 @@ namespace BookshelfApp.Controllers
 
 
 
-        // GET: Cars/Edit/1
+        // GET: Books/Edit/1
         public async Task<ActionResult> Edit(int id)
         {
-            var car = await _context.Car.FirstOrDefaultAsync(p => p.Id == id);
+            var book = await _context.Book.FirstOrDefaultAsync(p => p.Id == id);
             var loggedInUser = await GetCurrentUserAsync();
 
-            if (car.ApplicationUserId != loggedInUser.Id)
+            if (book.ApplicationUserId != loggedInUser.Id)
             {
                 return NotFound();
             }
-            return View(car);
+            return View(book);
         }
 
-        // POST: Paintings/Edit/1
+        // POST: Books/Edit/1
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(int id, Car car)
+        public async Task<ActionResult> Edit(int id, Book book)
         {
             try
             {
                 var user = await GetCurrentUserAsync();
-                car.ApplicationUserId = user.Id;
+                book.ApplicationUserId = user.Id;
 
-                _context.Car.Update(car);
+                _context.Book.Update(book);
                 await _context.SaveChangesAsync();
                 // TODO: Add update logic here
 
@@ -135,29 +135,29 @@ namespace BookshelfApp.Controllers
 
 
 
-        // GET: Cars/Delete/1
+        // GET: Books/Delete/1
         public async Task<ActionResult> Delete(int id)
         {
             var loggedInUser = await GetCurrentUserAsync();
-            var car = await _context.Car
+            var book = await _context.Book
                 .Include(p => p.ApplicationUser)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (car == null)
+            if (book == null)
             {
                 return NotFound();
             }
 
-            if (car.ApplicationUserId != loggedInUser.Id)
+            if (book.ApplicationUserId != loggedInUser.Id)
             {
                 return NotFound();
             }
 
-            return View(car);
+            return View(book);
         }
 
 
-        // POST: Cars/Delete/1
+        // POST: Books/Delete/1
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int id, IFormCollection collection)
@@ -166,8 +166,8 @@ namespace BookshelfApp.Controllers
             {
                 // TODO: Add delete logic here
 
-                var car = await _context.Car.FindAsync(id);
-                _context.Car.Remove(car);
+                var book = await _context.Book.FindAsync(id);
+                _context.Book.Remove(book);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
