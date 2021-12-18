@@ -12,12 +12,15 @@ namespace BookshelfApp.Models
         [Required]
         public int Id { get; set; }
         [Required]
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
         [Required]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
         [NotMapped]
         public string FullName => $"{FirstName} {LastName}";
         public string Penname { get; set; } //(optional)
+        [Display(Name = "Preferred Genre")]
         public string PreferredGenre {get; set;} //(optional)
         public List<Book> Books { get; set; }
         [Required]
