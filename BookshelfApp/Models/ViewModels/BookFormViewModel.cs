@@ -2,35 +2,30 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace BookshelfApp.Models
+namespace BookshelfApp.Models.ViewModels
 {
-    public class Book
+    public class BookFormViewModel
     {
         [Required]
         public int Id { get; set; }
         [Required]
-        public int ISBN { get; set; }
-        [Required]
         public string Title { get; set; }
         [Required]
         public string Author { get; set; }
-
+        [Required]
+        public int ISBN { get; set; }
         [Required(ErrorMessage = "Enter the issued date.")]
         [DataType(DataType.Date)]
         public DateTime PublishDate { get; set; }
+        public List<SelectListItem> GenreOptions { get; set; }
 
-        //@Html.TextBoxFor(model => model.IssueDate)
-        //@Html.ValidationMessageFor(model => model.IssueDate)
-        //https://stackoverflow.com/questions/18288675/display-datetime-value-in-dd-mm-yyyy-format-in-asp-net-mvc
-
-        [Required]
         public int GenreId { get; set; }
+
         public Genre Genre { get; set; }
-        [Required]
+
         public string ApplicationUserId { get; set; }
-        [Display(Name = "Owner")]
-        public ApplicationUser ApplicationUser { get; set; }
     }
 }

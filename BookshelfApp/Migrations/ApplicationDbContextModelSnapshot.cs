@@ -92,38 +92,6 @@ namespace BookshelfApp.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("BookshelfApp.Models.Author", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("ApplicationUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Penname")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PreferredGenre")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.ToTable("Author");
-                });
-
             modelBuilder.Entity("BookshelfApp.Models.Book", b =>
                 {
                     b.Property<int>("Id")
@@ -139,12 +107,8 @@ namespace BookshelfApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("AuthorId")
+                    b.Property<int>("GenreId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Genre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ISBN")
                         .HasColumnType("int");
@@ -160,9 +124,25 @@ namespace BookshelfApp.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.HasIndex("AuthorId");
+                    b.HasIndex("GenreId");
 
                     b.ToTable("Book");
+                });
+
+            modelBuilder.Entity("BookshelfApp.Models.Genre", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Genre");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -300,15 +280,6 @@ namespace BookshelfApp.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("BookshelfApp.Models.Author", b =>
-                {
-                    b.HasOne("BookshelfApp.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("BookshelfApp.Models.Book", b =>
                 {
                     b.HasOne("BookshelfApp.Models.ApplicationUser", "ApplicationUser")
@@ -317,9 +288,11 @@ namespace BookshelfApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BookshelfApp.Models.Author", null)
-                        .WithMany("Books")
-                        .HasForeignKey("AuthorId");
+                    b.HasOne("BookshelfApp.Models.Genre", "Genre")
+                        .WithMany()
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

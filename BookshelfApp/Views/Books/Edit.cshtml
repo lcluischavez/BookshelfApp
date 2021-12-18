@@ -1,4 +1,4 @@
-﻿@model BookshelfApp.Models.Book
+﻿@model BookshelfApp.Models.ViewModels.BookFormViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -24,9 +24,9 @@
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Genre" class="control-label"></label>
-                <input asp-for="Genre" class="form-control" />
-                <span asp-validation-for="Genre" class="text-danger"></span>
+                <label asp-for="Author" class="control-label"></label>
+                <input asp-for="Author" class="form-control" />
+                <span asp-validation-for="Author" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="PublishDate" class="control-label"></label>
@@ -34,14 +34,11 @@
                 <span asp-validation-for="PublishDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Author" class="control-label"></label>
-                <input asp-for="Author" class="form-control" />
-                <span asp-validation-for="Author" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ApplicationUserId" class="control-label"></label>
-                <select asp-for="ApplicationUserId" class="form-control" asp-items="ViewBag.ApplicationUserId"></select>
-                <span asp-validation-for="ApplicationUserId" class="text-danger"></span>
+                <label asp-for="Genre" class="control-label"></label>
+                <select asp-for="GenreId" class="form-control" asp-items="@Model.GenreOptions">
+                    <option selected value="null" disabled> Please select a type</option>
+                </select>
+                <span asp-validation-for="GenreId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

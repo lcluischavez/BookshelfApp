@@ -5,14 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BookshelfApp.Data;
 using BookshelfApp.Models;
+using BookshelfApp.Models.ViewModels;
 
 namespace BookshelfApp.Controllers
 {
     public class BooksController : Controller
-    { 
+    {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
@@ -26,23 +28,25 @@ namespace BookshelfApp.Controllers
         }
 
 
-        // GET: Cars
+        // GET: Books
         public async Task<ActionResult> Index(string searchString)
         {
             var user = await GetCurrentUserAsync();
             var books = await _context.Book
                 //.Where(ti => ti.ApplicationUserId == user.Id)
                 .Include(tdi => tdi.ApplicationUser)
+                .Include(tdi => tdi.Genre)
                 .ToListAsync();
 
             if (searchString != null)
             {
-                var filteredBooks = _context.Book.Where(s => s.Title.Contains(searchString) /* || s.ISBN.Contains(searchString)*/ ); 
+                var filteredBooks = _context.Book.Where(s => s.Title.Contains(searchString));
                 return View(filteredBooks);
             };
 
             return View(books);
         }
+
 
 
         // GET: Books/Details/1
@@ -53,40 +57,60 @@ namespace BookshelfApp.Controllers
                 return NotFound();
             }
 
-            var book = await _context.Book
+            var bookk = await _context.Book
                //.Where(p => p.UserId == user.Id)
                .Include(p => p.ApplicationUser)
+               .Include(p => p.Genre)
                .FirstOrDefaultAsync(p => p.Id == id);
 
-            if (book == null)
+            if (bookk == null)
             {
                 return NotFound();
             }
 
-            return View(book);
+            return View(bookk);
         }
 
 
 
         // GET: Books/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            return View();
+            var genreOptions = await _context.Genre.Select(e => new SelectListItem()
+            {
+                Text = e.Name,
+                Value = e.Id.ToString()
+            })
+                .ToListAsync();
+            var viewModel = new BookFormViewModel();
+            viewModel.GenreOptions = genreOptions;
+            return View(viewModel);
         }
 
 
         // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(Book book)
+        public async Task<ActionResult> Create(BookFormViewModel bookFormView)
         {
             try
             {
                 var user = await GetCurrentUserAsync();
-                book.ApplicationUserId = user.Id;
+                var books = new Book()
+                {
+                    Title = bookFormView.Title,
+                    Author = bookFormView.Author,
+                    ISBN = bookFormView.ISBN,
+                    PublishDate = bookFormView.PublishDate,
+                    ApplicationUserId = user.Id,
+                    GenreId = bookFormView.GenreId,
+                };
 
-                _context.Book.Add(book);
+
+                _context.Book.Add(books);
                 await _context.SaveChangesAsync();
+
+                // TODO: Add insert logic here
 
                 return RedirectToAction(nameof(Index));
             }
@@ -101,27 +125,54 @@ namespace BookshelfApp.Controllers
         // GET: Books/Edit/1
         public async Task<ActionResult> Edit(int id)
         {
-            var book = await _context.Book.FirstOrDefaultAsync(p => p.Id == id);
             var loggedInUser = await GetCurrentUserAsync();
+            var genres = await _context.Genre.Select(e => new SelectListItem()
+            {
+                Text = e.Name,
+                Value = e.Id.ToString()
+            })
+               .ToListAsync();
 
-            if (book.ApplicationUserId != loggedInUser.Id)
+            var bookk = await _context.Book.FirstOrDefaultAsync(e => e.Id == id);
+            var viewModel = new BookFormViewModel()
+            {
+                Title = bookk.Title,
+                Author = bookk.Author,
+                ISBN = bookk.ISBN,
+                PublishDate = bookk.PublishDate,
+                GenreId = bookk.GenreId,
+                GenreOptions = genres,
+            };
+
+            if (bookk.ApplicationUserId != loggedInUser.Id)
             {
                 return NotFound();
             }
-            return View(book);
+
+            return View(viewModel);
         }
+
 
         // POST: Books/Edit/1
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(int id, Book book)
+        public async Task<ActionResult> Edit(int id, BookFormViewModel bookFormView)
         {
             try
             {
                 var user = await GetCurrentUserAsync();
-                book.ApplicationUserId = user.Id;
+                var books = new Book()
+                {
+                    Id = id,
+                    Title = bookFormView.Title,
+                    Author = bookFormView.Author,
+                    ISBN = bookFormView.ISBN,
+                    PublishDate = bookFormView.PublishDate,
+                    ApplicationUserId = user.Id,
+                    GenreId = bookFormView.GenreId,
+                };
 
-                _context.Book.Update(book);
+                _context.Book.Update(books);
                 await _context.SaveChangesAsync();
                 // TODO: Add update logic here
 
@@ -139,21 +190,17 @@ namespace BookshelfApp.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             var loggedInUser = await GetCurrentUserAsync();
-            var book = await _context.Book
-                .Include(p => p.ApplicationUser)
-                .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (book == null)
+            var bookk = await _context.Book
+                .Include(e => e.ApplicationUser)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (bookk.ApplicationUserId != loggedInUser.Id)
             {
                 return NotFound();
             }
 
-            if (book.ApplicationUserId != loggedInUser.Id)
-            {
-                return NotFound();
-            }
-
-            return View(book);
+            return View(bookk);
         }
 
 
@@ -164,10 +211,9 @@ namespace BookshelfApp.Controllers
         {
             try
             {
-                // TODO: Add delete logic here
-
-                var book = await _context.Book.FindAsync(id);
-                _context.Book.Remove(book);
+                //TODO: Add delete logic here
+                var bookk = await _context.Book.FindAsync(id);
+                _context.Book.Remove(bookk);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

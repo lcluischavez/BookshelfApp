@@ -49,6 +49,19 @@ namespace BookshelfApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Genre",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Genre", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -155,29 +168,6 @@ namespace BookshelfApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Author",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(nullable: false),
-                    LastName = table.Column<string>(nullable: false),
-                    Penname = table.Column<string>(nullable: true),
-                    PreferredGenre = table.Column<string>(nullable: true),
-                    ApplicationUserId = table.Column<string>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Author", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Author_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Book",
                 columns: table => new
                 {
@@ -185,11 +175,10 @@ namespace BookshelfApp.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ISBN = table.Column<int>(nullable: false),
                     Title = table.Column<string>(nullable: false),
-                    Genre = table.Column<string>(nullable: false),
-                    PublishDate = table.Column<DateTime>(nullable: false),
                     Author = table.Column<string>(nullable: false),
-                    ApplicationUserId = table.Column<string>(nullable: false),
-                    AuthorId = table.Column<int>(nullable: true)
+                    PublishDate = table.Column<DateTime>(nullable: false),
+                    GenreId = table.Column<int>(nullable: false),
+                    ApplicationUserId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -201,11 +190,11 @@ namespace BookshelfApp.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Book_Author_AuthorId",
-                        column: x => x.AuthorId,
-                        principalTable: "Author",
+                        name: "FK_Book_Genre_GenreId",
+                        column: x => x.GenreId,
+                        principalTable: "Genre",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -248,19 +237,14 @@ namespace BookshelfApp.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Author_ApplicationUserId",
-                table: "Author",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Book_ApplicationUserId",
                 table: "Book",
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Book_AuthorId",
+                name: "IX_Book_GenreId",
                 table: "Book",
-                column: "AuthorId");
+                column: "GenreId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -287,10 +271,10 @@ namespace BookshelfApp.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Author");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Genre");
         }
     }
 }
